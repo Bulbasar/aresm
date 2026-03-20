@@ -17,6 +17,9 @@
   --text-light: #ffffff; /* hero / light text */
   --text-dark: #000; /* headings in sections */
 
+  --text-blue: #1976b4;
+  --text-gray: #6a6d6d;
+
   --border: rgba(0, 0, 0, 0.1);
 
   --fs-hero: clamp(3rem, 8vw, 5.5rem);
@@ -41,14 +44,24 @@ body.dark {
 /* Font Sizes                     */
 /* ------------------------------ */
 :root {
-  --fs-hero: 4.5rem;
-  --fs-page: 2rem;
-  --fs-section: 1.5rem;
-  --fs-subheading: 1.25rem;
-  --fs-medium: 1.125rem;
-  --fs-body: 1rem;
-  --fs-small: 0.875rem;
-  --fs-xsmall: 0.75rem;
+  /* ------------------------------ */
+  /* Responsive Font Sizes          */
+  /* ------------------------------ */
+
+  /* Hero / main headings */
+  --fs-hero: clamp(
+    3rem,
+    8vw,
+    4.5rem
+  ); /* scales from 3rem on mobile to 4.5rem on large screens */
+  --fs-header: clamp(2.5rem, 6vw, 3.5rem); /* section headers */
+  --fs-page: clamp(1.75rem, 4vw, 2rem); /* page titles */
+  --fs-section: clamp(1.125rem, 2.5vw, 1.5rem); /* section text headers */
+  --fs-subheading: clamp(1rem, 2vw, 1.25rem); /* small headers */
+  --fs-medium: clamp(0.95rem, 1.8vw, 1.125rem); /* medium body text */
+  --fs-body: clamp(0.875rem, 1.5vw, 1rem); /* standard paragraph */
+  --fs-small: clamp(0.75rem, 1.2vw, 0.875rem); /* small text, labels */
+  --fs-xsmall: clamp(0.65rem, 1vw, 0.75rem); /* very small text, captions */
 }
 
 /* ------------------------------ */
@@ -100,6 +113,9 @@ section {
 .text-hero {
   font-size: var(--fs-hero);
 }
+.text-header {
+  font-size: var(--fs-header);
+}
 .text-page {
   font-size: var(--fs-page);
 }
@@ -135,7 +151,12 @@ section {
 .text-dark {
   color: var(--text-dark);
 }
-
+.text-blue-palette {
+  color: var(--text-blue);
+}
+.text-gray-palette {
+  color: var(--text-gray);
+}
 /* Buttons */
 .btn-primary {
   background-color: var(--primary);
@@ -144,42 +165,4 @@ section {
 }
 .btn-primary:hover {
   background-color: var(--primary-hover);
-}
-
-/* Gradient text utility */
-.text-gradient {
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(to right, #60a5fa, #bfdbfe);
-}
-
-/* Container utility */
-.container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
-}
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
-}
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
 }

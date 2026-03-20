@@ -1,44 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Loader from "@/components/Loader";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import Showcase from "@/components/landing/Showcase";
 import About from "@/components/landing/About";
 import Properties from "@/components/landing/Properties";
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false); // light mode default
+  const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [navLight, setNavLight] = useState(true); // light text on hero
+  const [navLight, setNavLight] = useState(true);
+
+  // ✅ Correct ref typing
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1800);
     return () => clearTimeout(timer);
   }, []);
 
-  // Toggle body class for dark mode
   useEffect(() => {
     document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  // Track scroll to change navbar text color
+  // ✅ Scroll tracking (fixed)
   useEffect(() => {
-    const container = document.querySelector(".scrollable-content");
+    const container = scrollRef.current;
 
     const handleScroll = () => {
       const hero = document.getElementById("home");
       if (!hero) return;
+
       const rect = hero.getBoundingClientRect();
-      setNavLight(rect.bottom > 80); // If hero bottom > 80px, navbar is light
+      setNavLight(rect.bottom > 80);
     };
 
-    container?.addEventListener("scroll", handleScroll);
-    handleScroll(); // initial check
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      handleScroll();
+    }
 
-    return () => container?.removeEventListener("scroll", handleScroll);
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
   }, []);
 
   return (
@@ -52,7 +62,9 @@ export default function Home() {
     >
       <AnimatePresence mode="wait">{loading && <Loader />}</AnimatePresence>
 
+      {/* ✅ SCROLL CONTAINER */}
       <div
+        ref={scrollRef}
         className={`h-screen overflow-y-auto scrollable-content transition-opacity duration-700 ${
           loading ? "opacity-0" : "opacity-100"
         }`}
@@ -62,7 +74,11 @@ export default function Home() {
           setDarkMode={setDarkMode}
           navLight={navLight}
         />
+
+        {/* ✅ PASS REF */}
         {!loading && <Hero />}
+
+        <Showcase />
         <About />
         <Properties />
       </div>

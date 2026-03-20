@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, Variants, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  Variants,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 
 const container: Variants = {
   hidden: {},
@@ -18,7 +24,6 @@ const item: Variants = {
   },
 };
 
-// Carousel data
 const slides = [
   {
     id: 1,
@@ -29,7 +34,7 @@ const slides = [
   },
   {
     id: 2,
-    image: "/landing-hero-2.jpg", // You'll replace these paths later
+    image: "/landing-hero-2.jpg",
     headline: "DRIVING OPERATIONAL EXCELLENCE",
     description:
       "Streamlined processes and professional management for maximum property performance",
@@ -45,36 +50,87 @@ const slides = [
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const intervalRef = useRef<number | null>(null);
 
-  // Auto-advance carousel
-  useEffect(() => {
-    const timer = setInterval(() => {
+  // ✅ MOUSE PARALLAX VALUES
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // smooth motion (important)
+  const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+
+  // track mouse
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { innerWidth, innerHeight } = window;
+
+    const x = (e.clientX - innerWidth / 2) / innerWidth;
+    const y = (e.clientY - innerHeight / 2) / innerHeight;
+
+    mouseX.set(x * 40); // adjust strength here
+    mouseY.set(y * 40);
+  };
+
+  // AUTO SLIDE
+  const startAutoSlide = () => {
+    if (intervalRef.current) window.clearInterval(intervalRef.current);
+
+    intervalRef.current = window.setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
+  };
 
-    return () => clearInterval(timer);
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  useEffect(() => {
+    startAutoSlide();
+    return () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+    };
   }, []);
 
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    startAutoSlide();
+  };
+
+  const handleGetStarted = () => {
+    const el = document.getElementById("showcase");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <section id="home" className="h-screen w-screen relative overflow-hidden">
-      {/* Carousel Images with crossfade */}
+    <section
+      id="home"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="h-screen w-screen relative overflow-hidden"
+    >
+      {/* BACKGROUND */}
       {slides.map((slide, index) => (
         <motion.div
           key={slide.id}
           className="absolute inset-0"
-          initial={{ opacity: 0 }}
           animate={{ opacity: index === currentSlide ? 1 : 0 }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          transition={{ duration: 1.2 }}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slide.image})` }}
+          <motion.div
+            style={{
+              x: smoothX,
+              y: smoothY,
+              backgroundImage: `url(${slide.image})`,
+            }}
+            className="absolute inset-0 bg-cover bg-center scale-110 will-change-transform"
           />
+
           <div className="absolute inset-0 bg-black/50" />
         </motion.div>
       ))}
 
-      {/* Content */}
+      {/* CONTENT */}
       <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -83,33 +139,23 @@ export default function Hero() {
             initial="hidden"
             animate="show"
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
             className="max-w-4xl"
           >
             <motion.h1
               variants={item}
-              className="text-hero font-bold tracking-tight mb-6 text-light"
+              className="text-hero font-bold text-light mb-6"
             >
-              {slides[currentSlide].headline.split("<br />").map((line, i) => (
-                <span key={i}>
-                  {line}
-                  {i <
-                    slides[currentSlide].headline.split("<br />").length -
-                      1 && <br />}
-                </span>
-              ))}
+              {slides[currentSlide].headline}
             </motion.h1>
 
-            <motion.p
-              variants={item}
-              className="max-w-2xl mx-auto mb-8 text-body text-light"
-            >
+            <motion.p variants={item} className="text-body text-light mb-8">
               {slides[currentSlide].description}
             </motion.p>
 
             <motion.button
               variants={item}
-              className="px-8 py-3 rounded-lg font-semibold uppercase tracking-wide shadow-md btn-primary"
+              onClick={handleGetStarted}
+              className="btn-primary px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold cursor-pointer"
             >
               Get Started
             </motion.button>
@@ -117,39 +163,18 @@ export default function Hero() {
         </AnimatePresence>
       </div>
 
-      {/* Carousel Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+      {/* INDICATORS */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
         {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? "w-8 bg-white"
-                : "w-4 bg-white/50 hover:bg-white/80"
+            onClick={() => goToSlide(index)}
+            className={`h-1.5 rounded-full transition-all ${
+              index === currentSlide ? "w-8 bg-white" : "w-4 bg-white/50"
             }`}
-            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
-
-      {/* Optional: Previous/Next buttons */}
-      {/* <button
-        onClick={() =>
-          setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-        }
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
-        aria-label="Previous slide"
-      >
-        ←
-      </button>
-      <button
-        onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
-        aria-label="Next slide"
-      >
-        →
-      </button> */}
     </section>
   );
 }
