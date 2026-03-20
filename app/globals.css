@@ -85,14 +85,14 @@ section {
   overflow-y: auto;
 }
 
-.scrollable-content::-webkit-scrollbar {
+/* .scrollable-content::-webkit-scrollbar {
   width: 3px;
   height: 20px;
 }
 
 .scrollable-content::-webkit-scrollbar-thumb {
   background-color: #cecece;
-}
+} */
 
 /* ------------------------------ */
 /* Typography Utility Classes     */
