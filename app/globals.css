@@ -86,7 +86,7 @@ section {
 }
 
 .scrollable-content::-webkit-scrollbar {
-  width: 7px;
+  width: 3px;
   height: 20px;
 }
 
