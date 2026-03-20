@@ -1,13 +1,61 @@
 @import "tailwindcss";
 
+/* ------------------------------ */
+/* Global Colors & Dark Mode      */
+/* ------------------------------ */
+
+/* Light Mode (default) */
 :root {
-  --background: #1f1f1f;
-  --foreground: #eff1ee;
+  --bg: #eff1ee;
+  --fg: #1f1f1f;
+
+  --primary: #4a90e2;
+  --primary-hover: #2e66b0;
+
+  --text-main: #000; /* main text */
+  --text-muted: #4b4b4b; /* secondary text */
+  --text-light: #ffffff; /* hero / light text */
+  --text-dark: #000; /* headings in sections */
+
+  --border: rgba(0, 0, 0, 0.1);
+
+  --fs-hero: clamp(3rem, 8vw, 5.5rem);
+  --fs-display: clamp(2.5rem, 6vw, 4rem);
 }
 
+/* Dark Mode */
 body.dark {
-  --background: #eff1ee;
-  --foreground: #1f1f1f;
+  --bg: #1f1f1f;
+  /* --bg: #1f1f1f; */
+  --fg: #eff1ee;
+
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --text-light: #ffffff; /* hero text remains white */
+  --text-dark: #ffffff;
+
+  --border: rgba(255, 255, 255, 0.2);
+}
+
+/* ------------------------------ */
+/* Font Sizes                     */
+/* ------------------------------ */
+:root {
+  --fs-hero: 4.5rem;
+  --fs-page: 2rem;
+  --fs-section: 1.5rem;
+  --fs-subheading: 1.25rem;
+  --fs-medium: 1.125rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-xsmall: 0.75rem;
+}
+
+/* ------------------------------ */
+/* Base Styles                    */
+/* ------------------------------ */
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -15,12 +63,12 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* keep this */
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--fg);
   transition:
     background 0.5s ease,
     color 0.5s ease;
@@ -31,35 +79,107 @@ section {
   width: 100% !important;
 }
 
-/* font sizes */
-.hero-title {
-  font-size: 48px;
+.scrollable-content {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+  overflow-y: auto;
 }
 
-.page-title {
-  font-style: 30px;
+.scrollable-content::-webkit-scrollbar {
+  width: 7px;
+  height: 20px;
 }
 
-.section-title {
-  font-size: 24px;
+.scrollable-content::-webkit-scrollbar-thumb {
+  background-color: #cecece;
 }
 
-.subheading {
-  font-size: 20px;
+/* ------------------------------ */
+/* Typography Utility Classes     */
+/* ------------------------------ */
+.text-hero {
+  font-size: var(--fs-hero);
+}
+.text-page {
+  font-size: var(--fs-page);
+}
+.text-section {
+  font-size: var(--fs-section);
+}
+.text-subheading {
+  font-size: var(--fs-subheading);
+}
+.text-medium {
+  font-size: var(--fs-medium);
+}
+.text-body {
+  font-size: var(--fs-body);
+}
+.text-small {
+  font-size: var(--fs-small);
+}
+.text-xsmall {
+  font-size: var(--fs-xsmall);
 }
 
-.medium-text {
-  font-size: 18px;
+/* Dynamic colors for text */
+.text-main {
+  color: var(--text-main);
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.text-light {
+  color: var(--text-light);
+}
+.text-dark {
+  color: var(--text-dark);
 }
 
-.body-text {
-  font-size: 16px;
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--text-light);
+  transition: background-color 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
 }
 
-.small-text {
-  font-size: 14px;
+/* Gradient text utility */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, #60a5fa, #bfdbfe);
 }
 
-.extra-small-text {
-  font-size: 12px;
+/* Container utility */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
 }
