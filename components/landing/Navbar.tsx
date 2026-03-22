@@ -61,18 +61,33 @@ export default function Navbar({
 
   useEffect(() => {
     const container = document.querySelector(".scrollable-content");
+
     const handleActive = () => {
       let current = "home";
+      let closest = Infinity;
+
       sections.forEach(({ id }) => {
         const el = document.getElementById(id);
         if (!el) return;
+
         const rect = el.getBoundingClientRect();
-        if (rect.top <= 150 && rect.bottom >= 150) current = id;
+
+        const offset = Math.abs(rect.top - 120); // 👈 navbar offset
+
+        if (offset < closest && rect.bottom > 0) {
+          closest = offset;
+          current = id;
+        }
       });
+
       setActive(current);
     };
 
     container?.addEventListener("scroll", handleActive);
+
+    // ✅ RUN ON LOAD
+    handleActive();
+
     return () => container?.removeEventListener("scroll", handleActive);
   }, []);
 
