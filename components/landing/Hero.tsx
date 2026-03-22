@@ -87,8 +87,45 @@ export default function Hero() {
 
   useEffect(() => {
     startAutoSlide();
+
+    // 📱 MOBILE TILT SUPPORT
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return;
+
+      // gamma = left/right tilt (-90 to 90)
+      // beta = front/back tilt (-180 to 180)
+      const x = e.gamma / 45; // normalize
+      const y = e.beta / 45;
+
+      mouseX.set(x * 30);
+      mouseY.set(y * 30);
+    };
+
+    // request permission for iOS
+    const enableTilt = () => {
+      if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof (DeviceOrientationEvent as any).requestPermission === "function"
+      ) {
+        (DeviceOrientationEvent as any)
+          .requestPermission()
+          .then((response: string) => {
+            if (response === "granted") {
+              window.addEventListener("deviceorientation", handleOrientation);
+            }
+          })
+          .catch(console.error);
+      } else {
+        window.addEventListener("deviceorientation", handleOrientation);
+      }
+    };
+
+    // trigger once user interacts (required for iOS)
+    window.addEventListener("click", enableTilt, { once: true });
+
     return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      window.removeEventListener("deviceorientation", handleOrientation);
     };
   }, []);
 

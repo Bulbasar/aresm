@@ -78,7 +78,7 @@ export default function Home() {
         {/* ✅ PASS REF */}
         {!loading && <Hero />}
 
-        <Showcase />
+        <Showcase scrollRef={scrollRef} />
         <About />
         <Properties />
       </div>
