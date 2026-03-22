@@ -80,7 +80,7 @@ export default function Home() {
 
         <Showcase scrollRef={scrollRef} />
         <About />
-        <Properties />
+        {/* <Properties /> */}
       </div>
     </motion.main>
   );

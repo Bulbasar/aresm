@@ -107,14 +107,14 @@ export default function Showcase({ scrollRef }: ShowcaseProps) {
               }}
               onHoverStart={() => setHoveredIndex(idx)}
               onHoverEnd={() => setHoveredIndex(null)}
-              className="relative p-5 sm:p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-300 cursor-pointer hover:shadow-xl transition-all overflow-hidden"
+              className="relative p-5 sm:p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-300 cursor-pointer hover:shadow-lg transition-all overflow-hidden"
             >
               {/* 🌟 glow pulse */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={
                   startCount && !completed[idx]
-                    ? { opacity: [0.2, 0.5, 0.2] }
+                    ? { opacity: [1, 1, 1] }
                     : { opacity: 0 }
                 }
                 transition={{
@@ -124,7 +124,7 @@ export default function Showcase({ scrollRef }: ShowcaseProps) {
                 className="absolute inset-0 bg-blue-400/10 blur-xl"
               />
 
-              <h3 className="text-header font-bold text-blue-palette relative z-10">
+              <h3 className="text-page font-bold text-blue-palette relative z-10">
                 {startCount ? (
                   <CountUp
                     start={0}
