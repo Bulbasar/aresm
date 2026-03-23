@@ -9,16 +9,19 @@
   --bg: #eff1ee;
   --fg: #1f1f1f;
 
-  --primary: #4a90e2;
-  --primary-hover: #2e66b0;
+  --primary: #1d6fa8;
+  --primary-hover: #175886;
 
   --text-main: #000; /* main text */
   --text-muted: #4b4b4b; /* secondary text */
   --text-light: #ffffff; /* hero / light text */
   --text-dark: #000; /* headings in sections */
 
-  --text-blue: #1976b4;
+  --text-blue: #1d6fa8;
   --text-gray: #6a6d6d;
+
+  --bg-blue: #1d6fa8;
+  --bg-gray: #6a6d6d;
 
   --border: rgba(0, 0, 0, 0.1);
 
@@ -69,6 +72,7 @@ body.dark {
 /* ------------------------------ */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 html,
@@ -157,6 +161,30 @@ section {
 .text-gray-palette {
   color: var(--text-gray);
 }
+
+/* dynamic colors for bg */
+
+.bg-gray-palette {
+  background-color: var(--bg-gray);
+}
+
+/* Add these to your existing CSS */
+
+/* Footer specific styles */
+.bg-blue-palette {
+  background-color: var(--bg-blue);
+}
+
+/* Darker variant for copyright */
+.bg-blue-palette-darker {
+  background-color: var(--primary-hover); /* Darker shade of #1976b4 */
+}
+
+/* If you also need text colors for these backgrounds */
+.bg-blue-palette.text-white {
+  color: var(--text-light);
+}
+
 /* Buttons */
 .btn-primary {
   background-color: var(--primary);
@@ -168,3 +196,18 @@ section {
 }
 
 /* for slider */
+
+/* Responsive footer adjustments */
+@media (max-width: 768px) {
+  footer .bg-blue-palette > div {
+    text-align: center;
+  }
+
+  footer .bg-blue-palette .flex.gap-3 {
+    justify-content: center;
+  }
+
+  footer .hide-br-mobile br {
+    display: none;
+  }
+}

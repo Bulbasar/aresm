@@ -9,7 +9,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "ARESM CORP",
+  title: "ARESMCORP",
   description: "Created by Gerard Luis Martin",
 };
 

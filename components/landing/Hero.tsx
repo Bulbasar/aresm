@@ -192,7 +192,7 @@ export default function Hero() {
             <motion.button
               variants={item}
               onClick={handleGetStarted}
-              className="btn-primary px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold cursor-pointer"
+              className="btn-primary text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold cursor-pointer"
             >
               Get Started
             </motion.button>

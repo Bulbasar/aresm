@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Menu, X, Building2, Info, Home, Phone } from "lucide-react";
 
@@ -20,51 +19,66 @@ export default function Navbar({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // ✅ NEW: prevents scroll detection conflict
+  const [isScrolling, setIsScrolling] = useState(false);
+
   const sections = [
     { id: "home", label: "HOME", icon: Home },
     { id: "about", label: "ABOUT", icon: Info },
     { id: "properties", label: "PROPERTIES", icon: Building2 },
   ];
 
-  // Check if mobile on mount and resize
+  // Detect mobile
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Prevent body scroll when mobile menu is open
+  // Prevent body scroll when menu open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
+    document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isMenuOpen]);
 
+  // ✅ FIXED CLICK SCROLL
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
 
-    setIsMenuOpen(false); // Close menu after navigation
-    el.scrollIntoView({ behavior: "smooth" });
+    // 🔥 instantly update active
+    setActive(id);
+
+    // 🔥 disable scroll detection temporarily
+    setIsScrolling(true);
+
+    setIsMenuOpen(false);
+
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // 🔥 re-enable detection after scroll
+    setTimeout(() => {
+      setIsScrolling(false);
+    }, 600);
   };
 
+  // ✅ ACTIVE SECTION DETECTION
   useEffect(() => {
     const container = document.querySelector(".scrollable-content");
+    if (!container) return;
 
     const handleActive = () => {
+      // ❌ ignore while clicking scroll
+      if (isScrolling) return;
+
       let current = "home";
       let closest = Infinity;
+
+      const containerHeight = container.clientHeight;
+      const center = containerHeight / 2;
 
       sections.forEach(({ id }) => {
         const el = document.getElementById(id);
@@ -72,10 +86,15 @@ export default function Navbar({
 
         const rect = el.getBoundingClientRect();
 
-        const offset = Math.abs(rect.top - 120); // 👈 navbar offset
+        const sectionCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(center - sectionCenter);
 
-        if (offset < closest && rect.bottom > 0) {
-          closest = offset;
+        if (
+          distance < closest &&
+          rect.top < containerHeight * 0.75 &&
+          rect.bottom > containerHeight * 0.25
+        ) {
+          closest = distance;
           current = id;
         }
       });
@@ -83,13 +102,15 @@ export default function Navbar({
       setActive(current);
     };
 
-    container?.addEventListener("scroll", handleActive);
+    container.addEventListener("scroll", handleActive);
 
-    // ✅ RUN ON LOAD
-    handleActive();
+    // Fix initial state
+    requestAnimationFrame(() => {
+      requestAnimationFrame(handleActive);
+    });
 
-    return () => container?.removeEventListener("scroll", handleActive);
-  }, []);
+    return () => container.removeEventListener("scroll", handleActive);
+  }, [isScrolling]);
 
   return (
     <>
@@ -105,15 +126,17 @@ export default function Navbar({
           }}
         >
           {/* Logo */}
-          <Image
-            src="/logo2.jpeg"
-            alt="ARESM CORP"
-            width={isMobile ? 100 : 140}
-            height={isMobile ? 30 : 40}
-            className="transition-colors duration-500"
-          />
+          <h2
+            className="text-subheading font-bold"
+            style={{
+              color: navLight ? "var(--text-light)" : "var(--text-dark)",
+              letterSpacing: "2px",
+            }}
+          >
+            ARESMCORP
+          </h2>
 
-          {/* Desktop Navigation */}
+          {/* Desktop */}
           <div className="hidden md:flex gap-8">
             {sections.map(({ id, label }) => (
               <button
@@ -125,6 +148,7 @@ export default function Navbar({
                 }}
               >
                 {label}
+
                 <motion.span
                   layoutId="underline"
                   className="absolute left-0 -bottom-1 h-[2px] bg-current"
@@ -135,21 +159,20 @@ export default function Navbar({
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
             style={{
               color: navLight ? "var(--text-light)" : "var(--text-dark)",
             }}
-            aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </motion.div>
       </div>
 
-      {/* Full-Width Collapse Mobile Menu */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -162,7 +185,7 @@ export default function Navbar({
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
             />
 
-            {/* Full Width Menu Panel - Slides down from top */}
+            {/* Panel */}
             <motion.div
               initial={{ y: "-100%" }}
               animate={{ y: 0 }}
@@ -174,30 +197,28 @@ export default function Navbar({
               }}
             >
               <div className="h-full flex flex-col">
-                {/* Menu Header with Logo and Close */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-800">
-                  <Image
-                    src="/logo2.jpeg"
-                    alt="ARESM CORP"
-                    width={100}
-                    height={30}
-                  />
+                {/* Header */}
+                <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-300">
+                  <h2 className="text-subheading font-bold tracking-[2px]">
+                    ARESMCORP
+                  </h2>
+
                   <button
                     onClick={() => setIsMenuOpen(false)}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors cursor-pointer"
                   >
                     <X size={20} />
                   </button>
                 </div>
 
-                {/* Navigation Links */}
+                {/* Links */}
                 <nav className="flex-1 p-6">
                   <div className="space-y-2">
                     {sections.map(({ id, label, icon: Icon }) => (
                       <button
                         key={id}
                         onClick={() => handleScroll(id)}
-                        className="w-full flex items-center gap-4 p-4 rounded-xl transition-all"
+                        className="w-full flex items-center gap-4 p-4 rounded-xl transition-all cursor-pointer"
                         style={{
                           backgroundColor:
                             active === id
@@ -209,7 +230,8 @@ export default function Navbar({
                         }}
                       >
                         <Icon size={20} />
-                        <span className="text-lg font-medium">{label}</span>
+                        <span className="text-medium font-medium">{label}</span>
+
                         {active === id && (
                           <motion.div
                             layoutId="mobileActive"
@@ -221,8 +243,8 @@ export default function Navbar({
                   </div>
                 </nav>
 
-                {/* Contact Info */}
-                <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+                {/* Contact */}
+                <div className="p-6 border-t border-gray-200 dark:border-gray-300">
                   <p
                     className="text-sm mb-4"
                     style={{
@@ -231,35 +253,25 @@ export default function Navbar({
                   >
                     Contact us
                   </p>
+
                   <div className="space-y-3">
-                    <a
-                      href="tel:+1234567890"
-                      className="flex items-center gap-3 text-sm"
-                      style={{
-                        color: darkMode ? "#ffffff" : "#000000",
-                      }}
-                    >
+                    <a href="#" className="flex items-center gap-3 text-sm">
                       <Phone size={16} />
                       <span>+1 (234) 567-890</span>
                     </a>
-                    <a
-                      href="mailto:info@aresmcorp.com"
-                      className="flex items-center gap-3 text-sm"
-                      style={{
-                        color: darkMode ? "#ffffff" : "#000000",
-                      }}
-                    >
+
+                    <a href="#" className="flex items-center gap-3 text-sm">
                       <Building2 size={16} />
                       <span>info@aresmcorp.com</span>
                     </a>
                   </div>
                 </div>
 
-                {/* Dark Mode Toggle */}
+                {/* Dark Mode */}
                 <div className="p-6 pt-0">
                   <button
                     onClick={() => setDarkMode(!darkMode)}
-                    className="w-full py-3 px-4 rounded-xl border text-sm font-medium transition-colors"
+                    className="w-full py-3 px-4 rounded-xl border text-sm font-medium cursor-pointer"
                     style={{
                       borderColor: darkMode ? "#404040" : "#e5e7eb",
                       color: darkMode ? "#ffffff" : "#000000",

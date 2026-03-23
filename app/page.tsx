@@ -9,13 +9,13 @@ import Hero from "@/components/landing/Hero";
 import Showcase from "@/components/landing/Showcase";
 import About from "@/components/landing/About";
 import Properties from "@/components/landing/Properties";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [navLight, setNavLight] = useState(true);
 
-  // ✅ Correct ref typing
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -27,7 +27,15 @@ export default function Home() {
     document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  // ✅ Scroll tracking (fixed)
+  // ✅ FIX: reset scroll to top on load
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (container) {
+      container.scrollTop = 0;
+    }
+  }, []);
+
+  // navLight logic (no change)
   useEffect(() => {
     const container = scrollRef.current;
 
@@ -62,7 +70,6 @@ export default function Home() {
     >
       <AnimatePresence mode="wait">{loading && <Loader />}</AnimatePresence>
 
-      {/* ✅ SCROLL CONTAINER */}
       <div
         ref={scrollRef}
         className={`h-screen overflow-y-auto scrollable-content transition-opacity duration-700 ${
@@ -75,12 +82,13 @@ export default function Home() {
           navLight={navLight}
         />
 
-        {/* ✅ PASS REF */}
         {!loading && <Hero />}
 
         <Showcase scrollRef={scrollRef} />
         <About />
         <Properties />
+
+        <Footer darkMode={darkMode} />
       </div>
     </motion.main>
   );

@@ -176,7 +176,7 @@ export default function Properties() {
   );
 }
 
-// Separate component to manage staggered autoplay start
+// Separate component to manage staggered autoplay and slide offsets
 function CarouselWithOffset({
   category,
   index,
@@ -188,12 +188,21 @@ function CarouselWithOffset({
 }) {
   const swiperRef = useRef<SwiperType | null>(null);
   const [autoplayStarted, setAutoplayStarted] = useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
 
-  // Start autoplay with a staggered delay (e.g., 0ms, 600ms, 1200ms, 1800ms)
+  // Set different initial slides for each carousel to create offset
+  useEffect(() => {
+    // Each carousel starts at a different position
+    // Residential: starts at 0, Estate: starts at 1, Commercial: starts at 2, Office: starts at 3
+    const slideOffset = index % category.images.length;
+    setInitialSlide(slideOffset);
+  }, [index, category.images.length]);
+
+  // Start autoplay with staggered delays (0ms, 800ms, 1600ms, 2400ms)
   useEffect(() => {
     if (!swiperRef.current || autoplayStarted) return;
 
-    const delay = index * 600; // offset each carousel by 0.6s
+    const delay = index * 800; // Longer delay for more noticeable staggering
     const timeout = setTimeout(() => {
       if (swiperRef.current && swiperRef.current.autoplay) {
         swiperRef.current.autoplay.start();
@@ -203,6 +212,13 @@ function CarouselWithOffset({
 
     return () => clearTimeout(timeout);
   }, [index, autoplayStarted]);
+
+  // Configure autoplay with different speeds for each carousel
+  const getAutoplayDelay = () => {
+    // Different speeds for each carousel to prevent synchronization
+    const delays = [3000, 3500, 4000, 4500];
+    return delays[index % delays.length];
+  };
 
   return (
     <AnimateOnView delay={index * 0.1}>
@@ -228,11 +244,15 @@ function CarouselWithOffset({
             1024: { slidesPerView: 3 },
             1280: { slidesPerView: 4 },
           }}
-          autoplay={false} // do not start automatically
-          initialSlide={index * 2} // each carousel starts on a different slide
+          autoplay={{
+            delay: getAutoplayDelay(),
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+          initialSlide={initialSlide}
           navigation={false}
           pagination={{ clickable: true }}
-          loop
+          loop={true}
           className="!pb-10"
           onSwiper={(swiper) => {
             swiperRef.current = swiper;

@@ -179,7 +179,7 @@ export default function About() {
                   once={false}
                   className="flex items-center justify-center md:justify-start gap-3"
                 >
-                  <span className="w-2 h-2 rounded-full bg-blue-palette flex-shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-gray-palette flex-shrink-0" />
                   <span className="text-body text-gray-palette">{item}</span>
                 </AnimateOnView>
               ))}
@@ -254,7 +254,7 @@ export default function About() {
             {values.map((value, idx) => (
               <AnimateOnView
                 key={idx}
-                className="p-6 md:p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-300 dark:border-gray-700 text-center group hover:shadow-lg transition-all"
+                className="p-6 md:p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-100 dark:border-gray-400 text-center group hover:shadow-lg transition-all"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 + idx * 0.1 }}

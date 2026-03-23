@@ -13,12 +13,12 @@ export default function Loader() {
       transition={{ duration: 0.8 }}
     >
       <motion.h1
-        className="text-xl tracking-[0.3em] mb-6 text-dark"
+        className="text-page tracking-[0.3em] mb-6 text-dark"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        ARESM CORP
+        ARESMCORP
       </motion.h1>
 
       <motion.div
