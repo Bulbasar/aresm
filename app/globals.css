@@ -196,6 +196,10 @@ section {
 }
 
 /* for slider */
+.swiper-pagination-bullet-active {
+  color: var(--text-blue) !important;
+  background: var(--bg-blue) !important;
+}
 
 /* Responsive footer adjustments */
 @media (max-width: 768px) {
